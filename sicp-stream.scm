@@ -107,10 +107,10 @@
 (define s (cons-stream 1 (add-streams s s)))
 
 ;; 3.54
-(define (mul-strames s1 s2)
+(define (mul-stream s1 s2)
   (stream-map * s1 s2))
 (define factorials
-  (cons-stream 1 (mul-strames integers factorials)))
+  (cons-stream 1 (mul-stream integers factorials)))
 
 ;;3.55
 (define (partial-sums s)
@@ -181,14 +181,13 @@
 
 (stream-ref-iota sine-series 0 10)
 (stream-ref-iota cosine-series 0 10)
-;;scratch
+
 (define (partial-muls s)
   (cons-stream (stream-car s)
-               (mul-strames (stream-cdr s)
+               (mul-stream (stream-cdr s)
                             (partial-muls s))))
 
 ;; (stream-ref-iota (partial-muls (scale-stream ones -1)) 0 10)
-
 
 (define (sin-stream n)
   (stream-map * sine-series (cons-stream 1 (partial-muls (scale-stream ones n)))))

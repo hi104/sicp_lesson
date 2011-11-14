@@ -107,10 +107,17 @@
            proc))))
 
 '(
-  (eval '(define (fact x) (if (< x 1) x (+ x (fact (- x 1)))))  the-global-environment)
+  (eval '(define (fact x)
+           (if (< x 1)
+               x
+               (+ x (fact (- x 1)))))  the-global-environment)
   (eval '(fact 10) the-global-environment)
-  (eval '((lambda (n) (+ n 1)) 10)  the-global-environment)
-  (analyze '((lambda () (fact 10))))
-  (eval '((lambda () (fact 10))) the-global-environment)
-  ((analyze '((lambda () 1024))) the-global-environment)
+  (eval '((lambda (n)
+            (+ n 1)) 10)  the-global-environment)
+  (analyze '((lambda ()
+               (fact 10))))
+  (eval '((lambda ()
+            (fact 10))) the-global-environment)
+  ((analyze '((lambda ()
+                1024))) the-global-environment)
    )

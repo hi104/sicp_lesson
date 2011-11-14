@@ -265,7 +265,8 @@
                          (cons
                           (make-nested->let (cdr exp) body) '())
                          ))
-             (cdr (car exp))) body))
+             (cdr (car exp)))
+       body))
 
 (define (nested->let exp)
   (make-nested->let (cadr exp) (caddr exp)))
@@ -299,13 +300,16 @@
 
 (name-let-combination '(let fib-iter ((a 1)
                                       (b 0)
-                                      (count n))))
+                                      (count 10))
+                         (if (< count 1)
+                             b
+                             (fib-iter (+ a b) a (- count 1)))))
 ;;   ((lambda(fn)
 ;;      (fn fn))
 ;;    (lambda (f)
 ;;      (if (> a 0) ;valid state
 ;;          (begin (set! a (- a 1))  ;; next state
-;;                 (print a)  ;; blck state
+;;                 (print a)  ;; block state
 ;;                 (f f))
 ;;          'f))))
 
@@ -600,9 +604,25 @@
 
 (define (syntax-extend? exp)
   (tagged-list? exp 'syntax))
+
 (setup-syntax-enviroment)
 
+(define (find-syntax syntax )
+  (define (loop syntax list)
+    (if (null? list)
+        #f
+        (if (eq? syntax (car (car list)))
+            (cadr (car list))
+            (loop syntax (cdr list)))))
+  (loop syntax syntax-extend))
 
+(define (available-syntax? exp)
+    (if (pair? exp)
+        (if (find-syntax (car exp))
+            true
+            false)
+        false))
+      
 (define (eval exp env)
   (begin
     (if eval-debug ;;debug用
@@ -620,21 +640,19 @@
           ((begin? exp)
            (eval-sequence (begin-actions exp) env))
           ((cond? exp) (eval (cond->if exp) env))
+          ((available-syntax? exp) (eval ((find-syntax (car exp)) exp) env))
           ((application? exp)
            (let ((ope (eval (operator exp) env)))
-             (if (syntax-extend? ope)
-                 (eval ((cadr ope) exp) env)
                  (begin
                    (if eval-debug
                        (begin (print "application")
                               (print ope))
                        '())
                    (apply (eval (operator exp) env)
-                          (list-of-values (operands exp) env))))))
+                          (list-of-values (operands exp) env)))))
           (else
            (error "Unknown expression type --EVAL" exp))))
     )
-
 
 
 '(

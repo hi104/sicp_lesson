@@ -532,6 +532,10 @@
         (list '* *)
         (list '> >)
         (list '< <)
+        (list '= =)        
+        (list 'not not)
+        (list 'memq memq)                
+        (list 'print print)                
         ))
 
 (define (primitive-procedure-names)
